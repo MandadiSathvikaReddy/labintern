@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        #chatbox {
+            width: 300px;
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        
+        #input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        #input-box {
+            width: 80%;
+            padding: 10px;
+        }
+        
+        #send-btn {
+            width: 20%;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chatbox"></div>
+    <div id="input-container">
+        <input type="text" id="input-box" placeholder="Type a message..." />
+        <button id="send-btn">Send</button>
+    </div>
+
+    <script>
+        const chatbox = document.getElementById("chatbox");
+        const inputBox = document.getElementById("input-box");
+        const sendBtn = document.getElementById("send-btn");
+
+        // Function to add message to chatbox
+        function addMessage(message, sender) {
+            const messageElement = document.createElement("div");
+            messageElement.innerHTML = `<strong>${sender}: </strong>${message}`;
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        // Handle send button click
+        sendBtn.onclick = async() => {
+            const userMessage = inputBox.value;
+            if (userMessage.trim() === "") return;
+
+            addMessage(userMessage, "You");
+            inputBox.value = "";
+
+            // Call backend API to get bot response
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message: userMessage
+                }),
+            });
+            const data = await response.json();
+            addMessage(data.reply, "Bot");
+        };
+    </script>
+</body>
+
+</html>
